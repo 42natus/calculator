@@ -1,0 +1,41 @@
+html {
+    box-sizing: border-box;
+}
+
+*,
+* ::before,
+* ::after {
+    box-sizing: inherit;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid black;
+}
+
+.display {
+    height: 64px;
+    border: 2px solid rgb(113, 107, 107);
+}
+
+.buttons {
+    display: flex;
+}
+
+.operations {
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    width: 32px;
+}

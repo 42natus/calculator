@@ -23,5 +23,3 @@ function operate(operator, firstNumber, secondNumber) {
     }
     return "operator unknown";
 }
-
-console.log(operate("*", "3", "9")); // test
