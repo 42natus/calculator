@@ -69,16 +69,23 @@ function receiveDigit(event) {
         if (!operatorSelected) {
             firstNumber += numbers[target];
             updateDisplay(firstNumber);
-        } else { // comes after an operator
+        } else { // after operator is selected
             secondNumber += numbers[target];
             updateDisplay(secondNumber);
         }
     }
 }
 
-// when operator is pressed
+// operator has been pressed
 function receiveOperation(event) {
-    let target = event.target.id;
+    let target = event.target.id;  
+    
+    if (secondNumber) { // expression is complete; evaluate it
+        let clickEvent = new Event("click");
+        equals.dispatchEvent(clickEvent);
+    }
+
+    // no expression; push first operand and operator
     if (operators[target] !== undefined) {
         operator = operators[target];
         
