@@ -78,21 +78,18 @@ function receiveDigit(event) {
 
 // operator has been pressed
 function receiveOperation(event) {
-    let target = event.target.id;  
-    
+    let target = event.target.id;
+
+    // for chaining operations 
     if (secondNumber) { // expression is complete; evaluate it
         let clickEvent = new Event("click");
         equals.dispatchEvent(clickEvent);
     }
 
-    // no expression; push first operand and operator
+    // set operator; expression incomplete
     if (operators[target] !== undefined) {
         operator = operators[target];
-        
         operatorSelected = true;
-
-        stack.push(firstNumber);
-        stack.push(operator);
     }
 }
 
@@ -103,6 +100,8 @@ function updateDisplay(output) {
 
 const equals = operations.querySelector("#equals");
 equals.addEventListener("click", () => {
+    stack.push(firstNumber);
+    stack.push(operator);
     stack.push(secondNumber);
 
     // stack is now a complete expression
