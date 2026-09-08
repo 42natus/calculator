@@ -39,21 +39,74 @@ const numbers = {
     "zero": "0",
 };
 
-const numpad = document.querySelector(".numpad");
-numpad.addEventListener("click", receiveInput);
+// map operations buttons' id values to actual operators
+const operators = {
+    "divide": "/",
+    "minus": "-",
+    "plus": "+",
+    "multiply": "*",
+}
 
-function receiveInput(event) {
+// "equals": "=",
+// "backspace": "",
+
+const numpad = document.querySelector(".numpad");
+numpad.addEventListener("click", receiveDigit);
+
+const operations = document.querySelector(".operations");
+operations.addEventListener("click", receiveOperation);
+
+let operatorSelected = false;
+
+let stack = [];
+
+// store operands
+function receiveDigit(event) {
     let target = event.target.id;
     
     // ensure only digit buttons are picked up
     if (numbers[target] !== undefined) {
-        firstNumber += numbers[target];
+        if (!operatorSelected) {
+            firstNumber += numbers[target];
+            updateDisplay(firstNumber);
+        } else { // comes after an operator
+            secondNumber += numbers[target];
+            updateDisplay(secondNumber);
+        }
     }
-    
-    updateDisplay(firstNumber);
+}
+
+// when operator is pressed
+function receiveOperation(event) {
+    let target = event.target.id;
+    if (operators[target] !== undefined) {
+        operator = operators[target];
+        
+        operatorSelected = true;
+
+        stack.push(firstNumber);
+        stack.push(operator);
+    }
 }
 
 function updateDisplay(output) {
     const display = document.querySelector(".display");
     display.textContent = output;
 }
+
+const equals = operations.querySelector("#equals");
+equals.addEventListener("click", () => {
+    stack.push(secondNumber);
+
+    // stack is now a complete expression
+    let result;
+    result = operate(stack[1], stack[0], stack[2]);
+    updateDisplay(result);
+
+    // empty stack for result
+    stack = [];
+
+    // setup for next operation
+    firstNumber = result;
+    secondNumber = ""; // to store next operand
+});
