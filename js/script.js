@@ -7,10 +7,12 @@ let firstNumber = "";
 let secondNumber = "";
 let operator;
 
+let clickDecimalEvent = new Event("click");
+
 // execute one maths operation
 function operate(operator, firstNumber, secondNumber) {
-    const x = parseInt(firstNumber);
-    const y = parseInt(secondNumber);
+    const x = parseFloat(firstNumber);
+    const y = parseFloat(secondNumber);
 
     switch(operator) {
         case "+":
@@ -104,6 +106,11 @@ function receiveOperation(event) {
     if (operators[target] !== undefined) {
         operator = operators[target];
         operatorSelected = true;
+
+        // operand entered and operator selected — toggle `.` button
+        if (decimalPoint.disabled) {
+            decimalPoint.dispatchEvent(clickDecimalEvent);
+        }
     }
 }
 
@@ -148,6 +155,7 @@ equals.addEventListener("click", () => {
     operator = "";
     operatorSelected = false;
     newOperation = true; // the next operation is a new calculation
+    decimalPoint.dispatchEvent(clickDecimalEvent);
 });
 
 const clearAll = numpad.querySelector("#clear");
@@ -158,4 +166,23 @@ clearAll.addEventListener("click", () => {
     operator = "";
     operatorSelected = false;
     newOperation = true;
+    decimalPoint.disabled = false;
+});
+
+// toggle decimal point button
+const decimalPoint = numpad.querySelector("#decimal-point");
+decimalPoint.addEventListener("click", (event) => {
+    if (!event.isTrusted) { // `.` button toggled internally
+        decimalPoint.disabled = !decimalPoint.disabled;
+    } else { // user selected `.` — toggle after single use for each operand
+        if (!operatorSelected) {
+            firstNumber += ".";
+            decimalPoint.disabled = true;
+        } 
+        
+        if (operatorSelected) {
+            secondNumber += ".";
+            decimalPoint.disabled = true;
+        }
+    }
 });
