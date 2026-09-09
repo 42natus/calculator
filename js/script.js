@@ -58,16 +58,25 @@ operations.addEventListener("click", receiveOperation);
 
 let operatorSelected = false;
 
+let newOperation = true; 
+
 let stack = [];
 
 // store operands
 function receiveDigit(event) {
+    if (newOperation) { 
+	// abandon previous result; start new calculation
+        firstNumber = "";
+        newOperation = false;
+    }
+
     let target = event.target.id;
     
     // ensure only digit buttons are picked up
     if (numbers[target] !== undefined) {
         if (!operatorSelected) {
             firstNumber += numbers[target];
+            console.log(firstNumber);
             updateDisplay(firstNumber);
         } else { // after operator is selected
             secondNumber += numbers[target];
@@ -85,7 +94,12 @@ function receiveOperation(event) {
         let clickEvent = new Event("click");
         equals.dispatchEvent(clickEvent);
     }
-
+    
+    // clicking on `=` bubbles here and no other operator triggers a new calculation
+    if (target !== "equals") {
+        newOperation = false;
+    }
+    
     // set operator; expression incomplete
     if (operators[target] !== undefined) {
         operator = operators[target];
@@ -100,14 +114,19 @@ function updateDisplay(output) {
 
 const equals = operations.querySelector("#equals");
 equals.addEventListener("click", () => {
+    if (firstNumber && !secondNumber && !operator) {
+        updateDisplay(firstNumber);
+        return;
+    }
     stack.push(firstNumber);
     stack.push(operator);
     stack.push(secondNumber);
 
+    console.log(stack);
     // stack is now a complete expression
     let result;
-    result = operate(stack[1], stack[0], stack[2]);
-    updateDisplay(result);
+    result = Math.round(operate(stack[1], stack[0], stack[2]) * 10000) / 10000;
+    updateDisplay(result); // round result to 4 d.p. if necessary
 
     // empty stack for result
     stack = [];
@@ -115,4 +134,7 @@ equals.addEventListener("click", () => {
     // setup for next operation
     firstNumber = result;
     secondNumber = ""; // to store next operand
+    operator = "";
+    operatorSelected = false;
+    newOperation = true; // the next operation is a new calculation
 });
