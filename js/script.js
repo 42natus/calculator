@@ -107,6 +107,8 @@ function receiveOperation(event) {
     }
 }
 
+
+
 function updateDisplay(output) {
     const display = document.querySelector(".display");
     display.textContent = output;
@@ -118,6 +120,17 @@ equals.addEventListener("click", () => {
         updateDisplay(firstNumber);
         return;
     }
+
+    if (firstNumber && operator && !secondNumber) {
+        updateDisplay(firstNumber);
+        return;
+    }
+
+    if (secondNumber === "0") {
+        updateDisplay("Divide by zero. You do it!");
+        return;
+    }
+
     stack.push(firstNumber);
     stack.push(operator);
     stack.push(secondNumber);
