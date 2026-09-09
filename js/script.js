@@ -107,8 +107,6 @@ function receiveOperation(event) {
     }
 }
 
-
-
 function updateDisplay(output) {
     const display = document.querySelector(".display");
     display.textContent = output;
@@ -150,4 +148,14 @@ equals.addEventListener("click", () => {
     operator = "";
     operatorSelected = false;
     newOperation = true; // the next operation is a new calculation
+});
+
+const clearAll = numpad.querySelector("#clear");
+clearAll.addEventListener("click", () => {
+    updateDisplay("");
+    firstNumber = "";
+    secondNumber = "";
+    operator = "";
+    operatorSelected = false;
+    newOperation = true;
 });
