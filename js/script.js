@@ -78,7 +78,6 @@ function receiveDigit(event) {
     if (numbers[target] !== undefined) {
         if (!operatorSelected) {
             firstNumber += numbers[target];
-            console.log(firstNumber);
             updateDisplay(firstNumber);
         } else { // after operator is selected
             secondNumber += numbers[target];
@@ -90,6 +89,11 @@ function receiveDigit(event) {
 // operator has been pressed
 function receiveOperation(event) {
     let target = event.target.id;
+
+    // don't run calculation when backspace pressed and secondNumber has content
+    if (target === "backspace") {
+        return;
+    }
 
     // for chaining operations 
     if (secondNumber) { // expression is complete; evaluate it
@@ -158,7 +162,7 @@ equals.addEventListener("click", () => {
     stack = [];
 
     // setup for next operation
-    firstNumber = result;
+    firstNumber = String(result);
     secondNumber = ""; // to store next operand
     operator = "";
     operatorSelected = false;
@@ -194,3 +198,15 @@ decimalPoint.addEventListener("click", (event) => {
         }
     }
 });
+
+const backspace = operations.querySelector("#backspace");
+backspace.addEventListener("click", () => {
+    if (!operatorSelected) {
+        firstNumber = firstNumber.slice(0, -1);
+        console.log(firstNumber);
+        updateDisplay(firstNumber);
+    } else {
+        secondNumber = secondNumber.slice(0, -1);
+        updateDisplay(secondNumber);
+    }
+})
