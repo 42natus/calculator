@@ -133,6 +133,14 @@ equals.addEventListener("click", () => {
 
     if (secondNumber === "0") {
         updateDisplay("Divide by zero. You do it!");
+        // reset state
+        return;
+    }
+
+    // check if either operand is empty
+    if ((!firstNumber || !secondNumber) && (firstNumber !== 0 && secondNumber !== 0)) {
+        updateDisplay("Not enough operands");
+        // reset state
         return;
     }
 
