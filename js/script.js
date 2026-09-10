@@ -155,7 +155,7 @@ equals.addEventListener("click", () => {
     operator = "";
     operatorSelected = false;
     newOperation = true; // the next operation is a new calculation
-    decimalPoint.dispatchEvent(clickDecimalEvent);
+    decimalPoint.disabled = false;
 });
 
 const clearAll = numpad.querySelector("#clear");
