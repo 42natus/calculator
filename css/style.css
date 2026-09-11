@@ -6,6 +6,7 @@ html {
 * ::before,
 * ::after {
     box-sizing: inherit;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 body {
@@ -19,23 +20,123 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    border: 2px solid black;
+    /* border: 2px solid black; */
+    border-radius: 8px;
+    width: 21vw;
+    height: 60vh;
+    box-shadow: 5px 5px 25px rgb(171, 171, 171);
+    /* border: 2px solid rgb(224, 224, 224); */
+}
+
+.container .dots {
+    background-color: #000;
+    padding: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    gap: 3px;
+}
+
+.container .dots div {
+    border-radius: 100%;
+    width: 8px;
+    height: 8px;
+}
+
+.container .red {
+    background-color: rgb(235, 55, 55);
+}
+
+.container .yellow {
+    background-color: rgb(255, 183, 0);
+}
+
+.container .green {
+    background-color: rgb(6, 205, 6);
 }
 
 .display {
-    height: 64px;
-    border: 2px solid rgb(113, 107, 107);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    height: 25vh;
+    padding-right: 18px;
+    /* padding: 7vh 5vh 7vh; */
+    /* padding: 64px 0; */
+    /* text-align: right; */
+    /* padding-top: 10vh; */
+    /* height: 64px; */
 }
 
 .buttons {
     display: flex;
+    width: 100%;
+    height: 100%;
+    /* border-bottom-right-radius: 8px; */
+}
+
+.numpad {
+    background-color: #3b3b3b;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-bottom-left-radius: 8px;
+}
+
+.numpad button {
+    height: 100%;
+    width: 100%;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.row-one,
+.row-two,
+.row-three,
+.row-four {
+    height: 100%;
+    /* border: 3px solid teal; */
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 .operations {
     display: flex;
     flex-direction: column;
+    width: 21%;
+    align-items: center;
+    justify-content: stretch;
+}
+
+.operations button {
+    background-color: #e8e8e8;
+    color: #000;
+    width: 100%;
+}
+
+#equals {
+    background-color: rgb(255, 106, 0);
+    color: #fff;
+}
+
+#backspace {
+    background-color: rgb(235, 55, 55);
+    color: #fff;
+    border-bottom-right-radius: 8px;
+}
+
+#clear {
+    color: #969696;
 }
 
 button {
-    width: 32px;
+    width: 30%;
+    height: 25%;
+    background-color: #3b3b3b;
+    color: #fff;
+    border: none;
+    /* border: 3px solid teal; */
 }
