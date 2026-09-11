@@ -61,6 +61,7 @@ body {
     padding-right: 18px;
     background: linear-gradient(#000000, #212121);
     color: #ffffff;
+    font-size: 32px;
 }
 
 .buttons {
@@ -107,14 +108,14 @@ body {
 }
 
 #equals {
-    background: linear-gradient(#ff6a00, #c65200);
+    background: linear-gradient(#ff8800, #e95a02);
     color: #ffffff;
 }
 
 #backspace {
     border-bottom-right-radius: 8px;
     color: #ffffff;
-    background: linear-gradient(#d82c2c, #cd2020);
+    background: linear-gradient(#f13131, #cd2020);
 }
 
 #clear {
@@ -128,5 +129,6 @@ button {
     height: 25%;
     border: none;
     color: #ffffff;
+    font-size: 18px;
     background-color: transparent;
 }
