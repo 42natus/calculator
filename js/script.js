@@ -272,11 +272,14 @@ function receiveKeyboardInput(event) {
         }
     }
 
-    if (event.key === ".") {
-        if (!operatorSelected) {
+    if (event.key === "." && !operatorSelected) {
+        if (!firstNumber.includes(".")) {
             firstNumber += event.key;
             updateDisplay(firstNumber);
-        } else {
+        }
+        decimalPoint.dispatchEvent(clickEvent);
+    } else if (event.key === "." && operatorSelected) {
+        if (!secondNumber.includes(".")) {
             secondNumber += event.key;
             updateDisplay(secondNumber);
         }
