@@ -1,15 +1,76 @@
+let firstNumber = "";
+let secondNumber = "";
+let operator;
+
+// map of digit buttons' id values to actual digits
+const numbers = {
+    "seven": "7",
+    "eight": "8",
+    "nine": "9",
+    "four": "4",
+    "five": "5",
+    "six": "6",
+    "one": "1",
+    "two": "2",
+    "three": "3",
+    "zero": "0",
+};
+
+// map of operations buttons' id values to actual operators
+const operators = {
+    "divide": "/",
+    "minus": "-",
+    "plus": "+",
+    "multiply": "*",
+}
+
+// FLAGS
+let operatorSelected = false;
+let newOperation = true; 
+
+let stack = [];
+
+// DIGIT PRESS
+const numpad = document.querySelector(".numpad");
+numpad.addEventListener("click", receiveDigit);
+
+// OPERATOR PRESS
+const operations = document.querySelector(".operations");
+operations.addEventListener("click", receiveOperation);
+
+// EVALUATE EXPRESSION
+const equals = operations.querySelector("#equals");
+equals.addEventListener("click", evaluate);
+
+// CLEAR MEMORY AND DISPLAY
+const allClear = numpad.querySelector("#clear");
+allClear.addEventListener("click", resetState);
+
+// TOGGLE DECIMAL POINT BUTTON
+const decimalPoint = numpad.querySelector("#decimal-point");
+decimalPoint.addEventListener("click", toggleDecimalButton);
+
+// CLEAR LAST ENTRY
+const backspace = operations.querySelector("#backspace");
+backspace.addEventListener("click", clearEntry);
+
+// KEYBOARD SUPPORT
+const body = document.querySelector("body");
+const numberValues = Object.values(numbers);
+const operatorValues = Object.values(operators);
+body.addEventListener("keydown", receiveKeyboardInput)
+
+// PSEUDO-CLICK EVENTS
+let clickEvent = new Event("click");
+let clickDecimalButton = new Event("click");
+
+// calculator operations
 const add = (x, y) => x + y;
 const subtract = (x, y) => x - y;
 const multiply = (x, y) => x * y;
 const divide = (x, y) => x / y;
 
-let firstNumber = "";
-let secondNumber = "";
-let operator;
-
-let clickDecimalEvent = new Event("click");
-
-// execute one maths operation
+// execute one calculation
 function operate(operator, firstNumber, secondNumber) {
     const x = parseFloat(firstNumber);
     const y = parseFloat(secondNumber);
@@ -26,43 +87,6 @@ function operate(operator, firstNumber, secondNumber) {
     }
     return "operator unknown";
 }
-
-// map digit buttons' id values to actual digits
-const numbers = {
-    "seven": "7",
-    "eight": "8",
-    "nine": "9",
-    "four": "4",
-    "five": "5",
-    "six": "6",
-    "one": "1",
-    "two": "2",
-    "three": "3",
-    "zero": "0",
-};
-
-// map operations buttons' id values to actual operators
-const operators = {
-    "divide": "/",
-    "minus": "-",
-    "plus": "+",
-    "multiply": "*",
-}
-
-// "equals": "=",
-// "backspace": "",
-
-const numpad = document.querySelector(".numpad");
-numpad.addEventListener("click", receiveDigit);
-
-const operations = document.querySelector(".operations");
-operations.addEventListener("click", receiveOperation);
-
-let operatorSelected = false;
-
-let newOperation = true; 
-
-let stack = [];
 
 // store operands
 function receiveDigit(event) {
@@ -97,7 +121,6 @@ function receiveOperation(event) {
 
     // for chaining operations 
     if (secondNumber) { // expression is complete; evaluate it
-        let clickEvent = new Event("click");
         equals.dispatchEvent(clickEvent);
     }
     
@@ -113,7 +136,7 @@ function receiveOperation(event) {
 
         // operand entered and operator selected — toggle `.` button
         if (decimalPoint.disabled) {
-            decimalPoint.dispatchEvent(clickDecimalEvent);
+            decimalPoint.dispatchEvent(clickDecimalButton);
         }
     }
 }
@@ -123,8 +146,7 @@ function updateDisplay(output) {
     display.textContent = output;
 }
 
-const equals = operations.querySelector("#equals");
-equals.addEventListener("click", () => {
+function evaluate(event) {
     if (firstNumber && !secondNumber && !operator) {
         updateDisplay(firstNumber);
         return;
@@ -135,8 +157,8 @@ equals.addEventListener("click", () => {
         return;
     }
 
-    if (secondNumber === "0") {
-        updateDisplay("Divide by zero. You do it!");
+    if (secondNumber === "0" && operator === "/") {
+        updateDisplay("Divide by 0. You do it!");
         // reset state
         return;
     }
@@ -152,26 +174,19 @@ equals.addEventListener("click", () => {
     stack.push(operator);
     stack.push(secondNumber);
 
-    console.log(stack);
-    // stack is now a complete expression
     let result;
-    result = Math.round(operate(stack[1], stack[0], stack[2]) * 10000) / 10000;
-    updateDisplay(result); // round result to 4 d.p. if necessary
+    
+    // round result to 7 d.p. if necessary
+    result = Math.round(operate(stack[1], stack[0], stack[2]) * 10000000) / 10000000;
+    updateDisplay(result);
 
     // empty stack for result
     stack = [];
 
-    // setup for next operation
-    firstNumber = String(result);
-    secondNumber = ""; // to store next operand
-    operator = "";
-    operatorSelected = false;
-    newOperation = true; // the next operation is a new calculation
-    decimalPoint.disabled = false;
-});
+    setUpNextCalculation(result);
+}
 
-const clearAll = numpad.querySelector("#clear");
-clearAll.addEventListener("click", () => {
+function resetState() {
     updateDisplay("");
     firstNumber = "";
     secondNumber = "";
@@ -179,28 +194,35 @@ clearAll.addEventListener("click", () => {
     operatorSelected = false;
     newOperation = true;
     decimalPoint.disabled = false;
-});
+}
 
-// toggle decimal point button
-const decimalPoint = numpad.querySelector("#decimal-point");
-decimalPoint.addEventListener("click", (event) => {
-    if (!event.isTrusted) { // `.` button toggled internally
+function setUpNextCalculation(currentResult) {
+    resetState();
+    firstNumber = String(currentResult);
+    updateDisplay(currentResult);
+}
+
+function toggleDecimalButton(event) {
+    if (!event.isTrusted) { 
+        // `.` button toggled internally
         decimalPoint.disabled = !decimalPoint.disabled;
-    } else { // user selected `.` — toggle after single use for each operand
+    } else { 
+        // user selected `.` — toggle after single use for each operand
         if (!operatorSelected) {
             firstNumber += ".";
+            updateDisplay(firstNumber);
             decimalPoint.disabled = true;
         } 
         
         if (operatorSelected) {
             secondNumber += ".";
+            updateDisplay(secondNumber);
             decimalPoint.disabled = true;
         }
     }
-});
+}
 
-const backspace = operations.querySelector("#backspace");
-backspace.addEventListener("click", () => {
+function clearEntry() {
     if (!operatorSelected) {
         firstNumber = firstNumber.slice(0, -1);
         console.log(firstNumber);
@@ -209,17 +231,11 @@ backspace.addEventListener("click", () => {
         secondNumber = secondNumber.slice(0, -1);
         updateDisplay(secondNumber);
     }
-})
+}
 
-// KEYBOARD SUPPORT
-const body = document.querySelector("body");
-const numberValues = Object.values(numbers);
-const operatorValues = Object.values(operators);
-body.addEventListener("keydown", (event) => {
-    
-    // digits entered via keyboard start new calculation after result displayed
+function receiveKeyboardInput(event) {
     if (newOperation) {
-        // for chained calculations
+        // digits entered via keyboard start new calculation after result displayed (for chained calculations)
         if (operatorValues.includes(event.key)) {
             operator = event.key;
             operatorSelected = true;
@@ -248,8 +264,6 @@ body.addEventListener("keydown", (event) => {
             updateDisplay(secondNumber);
         }
     }
-    
-    let clickEvent = new Event("click");
 
     // evaluate a complete expression in a chain
     if (operatorSelected && firstNumber && secondNumber) {
@@ -276,4 +290,4 @@ body.addEventListener("keydown", (event) => {
     if (event.key === "=") {
         equals.dispatchEvent(clickEvent);
     }
-});
+}
