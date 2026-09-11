@@ -58,7 +58,7 @@ body {
     justify-content: flex-end;
     align-items: center;
     height: 25vh;
-    padding-right: 18px;
+    padding: 0 18px;
     background: linear-gradient(#000000, #212121);
     color: #ffffff;
     font-size: 32px;
