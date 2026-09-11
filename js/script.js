@@ -158,15 +158,15 @@ function evaluate(event) {
     }
 
     if (secondNumber === "0" && operator === "/") {
-        updateDisplay("Divide by 0. You do it!");
-        // reset state
+        resetState();
+        updateDisplay("I can't divide by 0. You try it!");
         return;
     }
 
     // check if either operand is empty
     if ((!firstNumber || !secondNumber) && (firstNumber !== 0 && secondNumber !== 0)) {
+        resetState();
         updateDisplay("Not enough operands");
-        // reset state
         return;
     }
 
