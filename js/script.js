@@ -101,7 +101,7 @@ function receiveOperation(event) {
         equals.dispatchEvent(clickEvent);
     }
     
-    // clicking on `=` bubbles here and no other operator triggers a new calculation
+    // clicking on `=` bubbles here and no other operator triggers a new calculation (for chained calculations)
     if (target !== "equals") {
         newOperation = false;
     }
@@ -210,3 +210,70 @@ backspace.addEventListener("click", () => {
         updateDisplay(secondNumber);
     }
 })
+
+// KEYBOARD SUPPORT
+const body = document.querySelector("body");
+const numberValues = Object.values(numbers);
+const operatorValues = Object.values(operators);
+body.addEventListener("keydown", (event) => {
+    
+    // digits entered via keyboard start new calculation after result displayed
+    if (newOperation) {
+        // for chained calculations
+        if (operatorValues.includes(event.key)) {
+            operator = event.key;
+            operatorSelected = true;
+        }
+
+        if (!operatorSelected) {
+            firstNumber = "";
+            newOperation = false;
+        }
+    }
+
+    if (!operatorSelected) {
+        // store first number and operator
+        if (numberValues.includes(event.key)) {
+            firstNumber += event.key;
+            updateDisplay(firstNumber);
+        }
+
+        if (operatorValues.includes(event.key) && firstNumber.length > 0) {
+            operator = event.key;
+            operatorSelected = true;
+        }
+    } else { // store second number
+        if (numberValues.includes(event.key)) {
+            secondNumber += event.key;
+            updateDisplay(secondNumber);
+        }
+    }
+    
+    let clickEvent = new Event("click");
+
+    // evaluate a complete expression in a chain
+    if (operatorSelected && firstNumber && secondNumber) {
+        if (operatorValues.includes(event.key)) {
+            equals.dispatchEvent(clickEvent);
+        }
+    }
+
+    if (event.key === ".") {
+        if (!operatorSelected) {
+            firstNumber += event.key;
+            updateDisplay(firstNumber);
+        } else {
+            secondNumber += event.key;
+            updateDisplay(secondNumber);
+        }
+        decimalPoint.dispatchEvent(clickEvent);
+    }
+
+    if (event.key === "Backspace") {
+        backspace.dispatchEvent(clickEvent);
+    }
+
+    if (event.key === "=") {
+        equals.dispatchEvent(clickEvent);
+    }
+});
