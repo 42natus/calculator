@@ -83,6 +83,16 @@ body {
     height: 100%;
 }
 
+.numpad .button-hover {
+    background-color: rgba(83, 82, 82, 0.6);
+    color: #fff;
+    /* border-radius: 50%; */
+}
+
+.numpad .button-clicked {
+    background-color: rgba(165, 165, 165, 0.6);
+}
+
 .row-one,
 .row-two,
 .row-three,
@@ -107,6 +117,14 @@ body {
     color: #000;
 }
 
+.operations .button-hover {
+    background-color: rgba(193, 193, 193, 0.6);
+}
+
+.operations .button-clicked {
+    background-color: rgba(101, 101, 101, 0.6);
+}
+
 #equals {
     background: linear-gradient(#ff8800, #e95a02);
     color: #ffffff;
@@ -121,7 +139,6 @@ body {
 #clear {
     color: #969696;
     border-bottom-left-radius: 8px;
-
 }
 
 button {

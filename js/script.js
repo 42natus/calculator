@@ -58,7 +58,7 @@ backspace.addEventListener("click", clearEntry);
 const body = document.querySelector("body");
 const numberValues = Object.values(numbers);
 const operatorValues = Object.values(operators);
-body.addEventListener("keydown", receiveKeyboardInput)
+body.addEventListener("keydown", receiveKeyboardInput);
 
 // PSEUDO-CLICK EVENTS
 let clickEvent = new Event("click");
@@ -294,3 +294,23 @@ function receiveKeyboardInput(event) {
         equals.dispatchEvent(clickEvent);
     }
 }
+
+// visual cues to show a button is being interacted with
+const buttons = document.querySelectorAll("button");
+buttons.forEach((button) => {
+    button.addEventListener("mouseenter", () => {
+        button.classList.add("button-hover");
+    });
+
+    button.addEventListener("mouseleave", () => {
+        button.classList.remove("button-hover");
+    });
+
+    button.addEventListener("mousedown", () => {
+        button.classList.add("button-clicked");
+    });
+
+    button.addEventListener("mouseup", () => {
+        button.classList.remove("button-clicked");
+    });
+});
