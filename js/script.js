@@ -1,76 +1,10 @@
-let firstNumber = "";
-let secondNumber = "";
-let operator;
-
-// map of digit buttons' id values to actual digits
-const numbers = {
-    "seven": "7",
-    "eight": "8",
-    "nine": "9",
-    "four": "4",
-    "five": "5",
-    "six": "6",
-    "one": "1",
-    "two": "2",
-    "three": "3",
-    "zero": "0",
-};
-
-// map of operations buttons' id values to actual operators
-const operators = {
-    "divide": "/",
-    "minus": "-",
-    "plus": "+",
-    "multiply": "*",
-}
-
-// FLAGS
-let operatorSelected = false;
-let newOperation = true; 
-
-let stack = [];
-
-// DIGIT PRESS
-const numpad = document.querySelector(".numpad");
-numpad.addEventListener("click", receiveDigit);
-
-// OPERATOR PRESS
-const operations = document.querySelector(".operations");
-operations.addEventListener("click", receiveOperation);
-
-// EVALUATE EXPRESSION
-const equals = operations.querySelector("#equals");
-equals.addEventListener("click", evaluate);
-
-// CLEAR MEMORY AND DISPLAY
-const allClear = numpad.querySelector("#clear");
-allClear.addEventListener("click", resetState);
-
-// TOGGLE DECIMAL POINT BUTTON
-const decimalPoint = numpad.querySelector("#decimal-point");
-decimalPoint.addEventListener("click", toggleDecimalButton);
-
-// CLEAR LAST ENTRY
-const backspace = operations.querySelector("#backspace");
-backspace.addEventListener("click", clearEntry);
-
-// KEYBOARD SUPPORT
-const body = document.querySelector("body");
-const numberValues = Object.values(numbers);
-const operatorValues = Object.values(operators);
-body.addEventListener("keydown", receiveKeyboardInput);
-
-// PSEUDO-CLICK EVENTS
-let clickEvent = new Event("click");
-let clickDecimalButton = new Event("click");
-
-// calculator operations
+// possible calculations
 const add = (x, y) => x + y;
 const subtract = (x, y) => x - y;
 const multiply = (x, y) => x * y;
-const divide = (x, y) => x / y;
+const divide = (x, y) => (y === 0) ? "I can't divide by 0. You try it!" : x / y;
 
-// execute one calculation
+// execute a calculation
 function operate(operator, firstNumber, secondNumber) {
     const x = parseFloat(firstNumber);
     const y = parseFloat(secondNumber);
@@ -85,214 +19,163 @@ function operate(operator, firstNumber, secondNumber) {
         case "/":
             return divide(x, y);
     }
-    return "operator unknown";
 }
+
+let currentInput = "";
+let firstNumber = "";
+let operator;
+let resultDisplayed = false;
+
+// map of operations buttons' id values to actual operators
+const operatorSymbols = {
+    "divide": "/",
+    "minus": "-",
+    "plus": "+",
+    "multiply": "*",
+}
+
+// DIGIT PRESS
+const numpad = document.querySelector(".numpad");
+numpad.addEventListener("click", receiveDigit);
+
+// OPERATOR PRESS
+const operators = document.querySelector(".operators");
+operators.addEventListener("click", receiveOperator);
+
+const display = document.querySelector(".display");
+
+// EVALUATE EXPRESSION
+const equals = document.querySelector("#equals");
+equals.addEventListener("click", evaluate);
+
+// CLEAR MEMORY AND DISPLAY
+const allClear = numpad.querySelector("#all-clear");
+allClear.addEventListener("click", resetState);
+
+// TOGGLE DECIMAL POINT BUTTON
+const decimalPoint = numpad.querySelector("#decimal-point");
+decimalPoint.addEventListener("click", setDecimalPoint);
+
+// CLEAR LAST ENTRY
+const clearEntry = operators.querySelector("#clear-entry");
+clearEntry.addEventListener("click", backSpace);
 
 // store operands
 function receiveDigit(event) {
-    if (newOperation) { 
-	// abandon previous result; start new calculation
+    let target = event.target;
+
+    if (resultDisplayed) { // just evaluated an expression
         firstNumber = "";
-        newOperation = false;
     }
 
-    let target = event.target.id;
-    
-    // ensure only digit buttons are picked up
-    if (numbers[target] !== undefined) {
-        if (!operatorSelected) {
-            firstNumber += numbers[target];
-            updateDisplay(firstNumber);
-        } else { // after operator is selected
-            secondNumber += numbers[target];
-            updateDisplay(secondNumber);
-        }
-    }
-}
-
-// operator has been pressed
-function receiveOperation(event) {
-    let target = event.target.id;
-
-    // don't run calculation when backspace pressed and secondNumber has content
-    if (target === "backspace") {
-        return;
-    }
-
-    // for chaining operations 
-    if (secondNumber) { // expression is complete; evaluate it
-        equals.dispatchEvent(clickEvent);
-    }
-    
-    // clicking on `=` bubbles here and no other operator triggers a new calculation (for chained calculations)
-    if (target !== "equals") {
-        newOperation = false;
-    }
-    
-    // set operator; expression incomplete
-    if (operators[target] !== undefined) {
-        operator = operators[target];
-        operatorSelected = true;
-
-        // operand entered and operator selected — toggle `.` button
-        if (decimalPoint.disabled) {
-            decimalPoint.dispatchEvent(clickDecimalButton);
-        }
-    }
+    currentInput += target.textContent;
+    updateDisplay(currentInput);
 }
 
 function updateDisplay(output) {
-    const display = document.querySelector(".display");
     display.textContent = output;
 }
 
-function evaluate(event) {
-    if (firstNumber && !secondNumber && !operator) {
-        updateDisplay(firstNumber);
-        return;
+// operator has been pressed
+function receiveOperator(event) {
+    let target = event.target.id;
+
+    if (!firstNumber) {
+        firstNumber = currentInput;
+        currentInput = "";
+    } else if (currentInput) { // complete expression
+        let result = operate(operator, firstNumber, currentInput);
+        if (typeof result !== "number") { // divide by 0 error
+            resetState();
+            updateDisplay(result);
+            return;
+        }
+
+        // round result to 10 d.p.
+        result = Math.round(result * 10000000000) / 10000000000;
+
+        updateDisplay(result);
+
+        // set up for chained calculation
+        firstNumber = result;
+        currentInput = "";
     }
-
-    if (firstNumber && operator && !secondNumber) {
-        updateDisplay(firstNumber);
-        return;
-    }
-
-    if (secondNumber === "0" && operator === "/") {
-        resetState();
-        updateDisplay("I can't divide by 0. You try it!");
-        return;
-    }
-
-    // check if either operand is empty
-    if ((!firstNumber || !secondNumber) && (firstNumber !== 0 && secondNumber !== 0)) {
-        resetState();
-        updateDisplay("Not enough operands");
-        return;
-    }
-
-    stack.push(firstNumber);
-    stack.push(operator);
-    stack.push(secondNumber);
-
-    let result;
     
-    // round result to 7 d.p. if necessary
-    result = Math.round(operate(stack[1], stack[0], stack[2]) * 10000000) / 10000000;
+    resultDisplayed = false; // waiting for second operand
+    operator = operatorSymbols[target];
+}
+
+function evaluate(event) {
+    if (!firstNumber || !currentInput) { // not enough operands
+        /* 
+        Prevent bubbling to receiveOperator(). This prevents
+        the modification of resultDisplayed right after a calculation.
+        */
+        event.stopPropagation();
+        return;
+    }
+
+    let result = operate(operator, firstNumber, currentInput);
+    if (typeof result !== "number") { // divide by 0 error
+        resetState();
+        updateDisplay(result);
+        return;
+    }
+
+    // round result to 10 d.p.
+    result = Math.round(result * 10000000000) / 10000000000;
+    
+    // reset state but display result
+    resetState();
     updateDisplay(result);
 
-    // empty stack for result
-    stack = [];
+    // set up for new calculation on digit press
+    firstNumber = result;
+    resultDisplayed = true;
 
-    setUpNextCalculation(result);
+    event.stopPropagation();
 }
 
-function resetState() {
-    updateDisplay("");
+function resetState(event) {
+    currentInput = "";
     firstNumber = "";
-    secondNumber = "";
-    operator = "";
-    operatorSelected = false;
-    newOperation = true;
-    decimalPoint.disabled = false;
-}
+    operator = null;
+    resultDisplayed = false;
+    updateDisplay("");
 
-function setUpNextCalculation(currentResult) {
-    resetState();
-    firstNumber = String(currentResult);
-    updateDisplay(currentResult);
-}
-
-function toggleDecimalButton(event) {
-    if (!event.isTrusted) { 
-        // `.` button toggled internally
-        decimalPoint.disabled = !decimalPoint.disabled;
-    } else { 
-        // user selected `.` — toggle after single use for each operand
-        if (!operatorSelected) {
-            firstNumber += ".";
-            updateDisplay(firstNumber);
-            decimalPoint.disabled = true;
-        } 
-        
-        if (operatorSelected) {
-            secondNumber += ".";
-            updateDisplay(secondNumber);
-            decimalPoint.disabled = true;
-        }
+    /* 
+    Prevent bubbling to receiveDigits(). 
+    This prevents "AC" from being displayed.
+    */
+    if (event && event.target.id === "all-clear") {
+        event.stopPropagation();
     }
 }
 
-function clearEntry() {
-    if (!operatorSelected) {
-        firstNumber = firstNumber.slice(0, -1);
-        console.log(firstNumber);
-        updateDisplay(firstNumber);
-    } else {
-        secondNumber = secondNumber.slice(0, -1);
-        updateDisplay(secondNumber);
+function setDecimalPoint(event) {
+    if (!currentInput.includes(".")) { // allow one decimal point per operand
+        currentInput += ".";
+        updateDisplay(currentInput);
     }
+
+    /* 
+    Prevent bubbling to receiveDigits(). 
+    This prevents "." from also being duplicated in the display.
+    */
+    event.stopPropagation();
 }
 
-function receiveKeyboardInput(event) {
-    if (newOperation) {
-        // digits entered via keyboard start new calculation after result displayed (for chained calculations)
-        if (operatorValues.includes(event.key)) {
-            operator = event.key;
-            operatorSelected = true;
-        }
-
-        if (!operatorSelected) {
-            firstNumber = "";
-            newOperation = false;
-        }
+function backSpace(event) {
+    if (currentInput) {
+        currentInput = currentInput.slice(0, -1);
+        updateDisplay(currentInput);
     }
 
-    if (!operatorSelected) {
-        // store first number and operator
-        if (numberValues.includes(event.key)) {
-            firstNumber += event.key;
-            updateDisplay(firstNumber);
-        }
-
-        if (operatorValues.includes(event.key) && firstNumber.length > 0) {
-            operator = event.key;
-            operatorSelected = true;
-        }
-    } else { // store second number
-        if (numberValues.includes(event.key)) {
-            secondNumber += event.key;
-            updateDisplay(secondNumber);
-        }
-    }
-
-    // evaluate a complete expression in a chain
-    if (operatorSelected && firstNumber && secondNumber) {
-        if (operatorValues.includes(event.key)) {
-            equals.dispatchEvent(clickEvent);
-        }
-    }
-
-    if (event.key === "." && !operatorSelected) {
-        if (!firstNumber.includes(".")) {
-            firstNumber += event.key;
-            updateDisplay(firstNumber);
-        }
-        decimalPoint.dispatchEvent(clickEvent);
-    } else if (event.key === "." && operatorSelected) {
-        if (!secondNumber.includes(".")) {
-            secondNumber += event.key;
-            updateDisplay(secondNumber);
-        }
-        decimalPoint.dispatchEvent(clickEvent);
-    }
-
-    if (event.key === "Backspace") {
-        backspace.dispatchEvent(clickEvent);
-    }
-
-    if (event.key === "=") {
-        equals.dispatchEvent(clickEvent);
-    }
+    /* 
+    Prevent bubbling to receiveOperator(). 
+    This stops currentInput from being set to "".
+    */
+    event.stopPropagation();
 }
 
 // visual cues to show a button is being interacted with
@@ -314,3 +197,92 @@ buttons.forEach((button) => {
         button.classList.remove("button-clicked");
     });
 });
+
+// KEYBOARD SUPPORT
+const body = document.querySelector("body");
+const operatorValues = Object.values(operators);
+body.addEventListener("keydown", receiveKeyboardInput);
+let clickEvent = new Event("click", {bubbles: true});
+
+//numpad buttons
+const one = numpad.querySelector("#one");
+const two = numpad.querySelector("#two");
+const three = numpad.querySelector("#three");
+const four = numpad.querySelector("#four");
+const five = numpad.querySelector("#five");
+const six = numpad.querySelector("#six");
+const seven = numpad.querySelector("#seven");
+const eight = numpad.querySelector("#eight");
+const nine = numpad.querySelector("#nine");
+const zero = numpad.querySelector("#zero");
+
+// operator buttons
+const division = operators.querySelector("#divide");
+const minus = operators.querySelector("#minus");
+const plus = operators.querySelector("#plus");
+const multiplication = operators.querySelector("#multiply");
+
+function receiveKeyboardInput(event) {
+    switch(event.key) { 
+        // digits
+        case "1":
+            one.dispatchEvent(clickEvent);
+            break;
+        case "2":
+            two.dispatchEvent(clickEvent);
+            break;
+        case "3":
+            three.dispatchEvent(clickEvent);
+            break;
+        case "4":
+            four.dispatchEvent(clickEvent);
+            break;
+        case "5":
+            five.dispatchEvent(clickEvent);
+            break;
+        case "6":
+            six.dispatchEvent(clickEvent);
+            break;
+        case "7":
+            seven.dispatchEvent(clickEvent);
+            break;
+        case "8":
+            eight.dispatchEvent(clickEvent);
+            break;
+        case "9":
+            nine.dispatchEvent(clickEvent);
+            break;
+        case "0":
+            zero.dispatchEvent(clickEvent);
+            break;
+
+        // operators
+        case "/":
+            division.dispatchEvent(clickEvent);
+            break;
+        case "-":
+            minus.dispatchEvent(clickEvent);
+            break;
+        case "+":
+            plus.dispatchEvent(clickEvent);
+            break;
+        case "*":
+        case "x":
+            multiplication.dispatchEvent(clickEvent);
+            break;
+
+        // others
+        case ".":
+            decimalPoint.dispatchEvent(clickEvent);
+            break;
+        case "Backspace":
+            clearEntry.dispatchEvent(clickEvent);
+            break;
+        case "=":
+            equals.dispatchEvent(clickEvent);
+            break;
+        case "Delete":
+            allClear.dispatchEvent(clickEvent);
+            break;
+    }
+}

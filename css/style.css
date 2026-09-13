@@ -42,15 +42,15 @@ body {
 }
 
 .container .red {
-    background-color: rgb(235, 55, 55);
+    background-color: #eb3737;
 }
 
 .container .yellow {
-    background-color: rgb(255, 183, 0);
+    background-color: #ffb700;
 }
 
 .container .green {
-    background-color: rgb(6, 205, 6);
+    background-color: #06cd06;
 }
 
 .display {
@@ -103,7 +103,7 @@ body {
     justify-content: space-evenly;
 }
 
-.operations {
+.operators {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -112,16 +112,16 @@ body {
 
 }
 
-.operations button {
+.operators button {
     width: 100%;
     color: #000;
 }
 
-.operations .button-hover {
+.operators .button-hover {
     background-color: rgba(193, 193, 193, 0.6);
 }
 
-.operations .button-clicked {
+.operators .button-clicked {
     background-color: rgba(101, 101, 101, 0.6);
 }
 
@@ -130,15 +130,22 @@ body {
     color: #ffffff;
 }
 
-#backspace {
+#clear-entry {
     border-bottom-right-radius: 8px;
     color: #ffffff;
     background: linear-gradient(#f13131, #cd2020);
 }
 
-#clear {
+#all-clear {
     color: #969696;
     border-bottom-left-radius: 8px;
+}
+
+#clear-entry div,
+#all-clear div {
+    padding: 0;
+    margin-top: 8px;
+    font-size: 10px;
 }
 
 button {
